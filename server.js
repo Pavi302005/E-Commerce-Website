@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
@@ -251,6 +251,13 @@ const product = [
     { product_id: 'C029', name: 'Small Pet Bed (Washable)', price: 29.00, category: 'Pet Care', is_organic: false, in_stock: true, unit_of_sale: 'each', image_url: 'https://th.bing.com/th/id/OIP.m9BKwRrtYhND-axmiCfQXQHaER?w=314&h=181&c=7&r=0&o=7&cb=12&pid=1.7&rm=3' },
     { product_id: 'C030', name: 'Wet Dog Food (Beef & Vegetable)', price: 3.50, category: 'Pet Care', is_organic: false, in_stock: true, unit_of_sale: 'per can', image_url: 'https://th.bing.com/th/id/OIP.hE_KLEytL1ndp-Y7lI0UTwHaHa?w=217&h=217&c=7&r=0&o=7&cb=12&pid=1.7&rm=3' },
 ];
+app.get("/", (req, res) => {
+  res.send("Grocery Backend API is Running");
+});
+
+app.get("/products", (req, res) => {
+  res.json(product);
+});
 app.get("/api/items", (req, res) => {
     const q = req.query.q; // search term from URL
     if (q) {
@@ -266,5 +273,7 @@ app.get('/products', (req, res) => {
     res.json(product);
 });
 
-// 🟩 Server start
-app.listen(PORT, () => console.log(`✅ Server running at http://localhost:${PORT}/api/items`));
+app.listen(PORT, () => {
+  console.log("Server running on port", PORT);
+});
+

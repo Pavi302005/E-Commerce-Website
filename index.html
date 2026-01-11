@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>FreshCart Grocery E-commerce</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <style>
+        /* General Setup */
+        body { font-family: sans-serif; margin: 0; background-color: #f7f7f7; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        a { text-decoration: none; color: inherit; }
+
+        /* HEADER & NAVBAR */
+        .grocery-navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-direction:row;
+            gap:120px;
+            padding: 10px 40px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            flex-wrap: wrap; 
+            position:fixed;
+            z-index: 1;
+            width:95%;
+            margin-top:-2%;
+        }
+
+        .navbar-logo a { font-size: 1.5em; font-weight: bold; color: #28a745; }
+        .navbar-links { display: flex; align-items: center; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; padding: 10px 15px; margin: 0 5px; color: #555; transition: color 0.2s; }
+        .nav-item:hover { color: #007bff; }
+        .nav-item i { font-size: 1.2em; margin-bottom: 3px; }
+        .navbar-cart .cart-btn { background-color: #ffc107; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; color: #333; font-weight: bold; position: relative; }
+        .navbar-cart .cart-count { background-color: #dc3545; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7em; position: absolute; top: -5px; right: -5px; }
+
+        /* ACCOUNT DROPDOWN STYLES (THE FIX) */
+        .account-dropdown-container {
+            position: relative; /* Container for absolute positioning */
+            margin-left: 10px;
+        }
+
+        .dropdown-menu {
+            /* HIDE BY DEFAULT */
+            display: none; 
+            
+            /* POSITIONING AND LAYER */
+            position: absolute;
+            top: 100%; 
+            right: 0;
+            z-index: 1000; /* CRUCIAL: Ensures it sits above other content */
+            
+            /* Appearance */
+            min-width: 180px;
+            background-color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden; 
+            padding: 5px 0;
+            margin-top: 5px;
+        }
+
+        /* JavaScript Toggled Class to SHOW the dropdown */
+        .dropdown-menu.active {
+            display: block;
+        }
+
+        .dropdown-link {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: #333;
+            font-size: 0.95em;
+            cursor: pointer; /* Ensure pointer shows on hover */
+        }
+
+        .dropdown-link:hover {
+            background-color: #f5f5f5;
+            color: #007bff;
+        }
+
+        /* --- MODAL STYLES --- */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 2000; /* Higher than the dropdown */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6); 
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #000;
+            text-decoration: none;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .auth-form label { display: block; margin-top: 10px; font-weight: bold; font-size: 0.9em; }
+        .auth-form input[type="email"],
+        .auth-form input[type="password"],
+        .auth-form input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .auth-submit-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 1em;
+            transition: background-color 0.2s;
+        }
+        .auth-submit-btn:hover { background-color: #218838; }
+        .switch-link { text-align: center; margin-top: 15px; font-size: 0.9em; }
+        .switch-link a { color: #007bff; text-decoration: underline; cursor: pointer; }
+        .auth-form.hidden { display: none; }
+        .hero-section { display: flex; justify-content: space-between; align-items: center; background-color: #e9f7ef; padding: 40px; border-radius: 10px; margin-top: 30px; }
+        .hero-text { max-width: 50%; }
+        .hero-text h1 { font-size: 2.5em; color: #28a745; margin-bottom: 10px; }
+        .shop-now-btn { display: inline-block; background-color: #ffc107; color: #333; padding: 12px 25px; border-radius: 5px; margin-top: 20px; font-weight: bold; transition: background-color 0.2s; }
+        .shop-now-btn:hover { background-color: #e0a800; }
+        .hero-image img { max-width: 350px; height: auto; }
+
+        .quick-categories, .featured-products, .trust-bar { margin: 40px 0; }
+        .category-grid, .product-grid { display: grid; gap: 20px; }
+        .category-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); text-align: center; }
+        .category-card { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); transition: transform 0.2s; }
+        .category-card:hover { transform: translateY(-5px); }
+        .category-card i { font-size: 2em; color: #28a745; margin-bottom: 10px; }
+        
+        .product-grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+        .product-card { background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); padding: 15px; text-align: center; }
+        .product-image { width: 100%; height: 150px; object-fit: contain; border-radius: 5px; margin-bottom: 10px; }
+        .product-card h3 { margin: 10px 0; font-size: 1.1em; }
+        .product-card .price { color: #dc3545; font-weight: bold; margin-bottom: 10px; }
+        .add-to-cart-btn { background-color: #007bff; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; }
+        .add-to-cart-btn:hover { background-color: #0056b3; }
+        .view-all-btn { display: inline-block; background-color: #007bff; color: white; padding: 10px 20px; border-radius: 5px; font-weight: bold; }
+
+        .trust-bar { display: flex; justify-content: space-around; background-color: #fff; padding: 30px 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); }
+        .value-prop { text-align: center; max-width: 250px; }
+        .value-prop i { font-size: 2em; color: #28a745; margin-bottom: 10px; }
+        .value-prop h4 { margin: 0; }
+        .value-prop p { margin-top: 5px; font-size: 0.9em; color: #666; }
+
+        /* Footer */
+        footer { background-color: #343a40; color: white; padding-top: 40px; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; padding-bottom: 30px; }
+        .footer-col h3, .footer-col h4 { border-bottom: 2px solid #28a745; padding-bottom: 5px; margin-bottom: 15px; }
+        .footer-col ul { list-style: none; padding: 0; }
+        .footer-col ul li { margin-bottom: 8px; }
+        .footer-col ul li a:hover { color: #ffc107; }
+        .social-icons a { color: white; font-size: 1.5em; margin-right: 15px; transition: color 0.2s; }
+        .social-icons a:hover { color: #007bff; }
+        .newsletter-form input { padding: 10px; border: none; border-radius: 5px 0 0 5px; }
+        .newsletter-form button { padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 0 5px 5px 0; cursor: pointer; margin-left: -4px; }
+        .payment-icons i { font-size: 1.8em; margin-top: 15px; margin-right: 10px; }
+        .footer-bottom { border-top: 1px solid #495057; padding: 15px 0; text-align: center; font-size: 0.9em; }
+        .footer-bottom a { color: #ffc107; }
+        /* ============================
+   RESPONSIVE DESIGN FIXES
+   ============================ */
+
+/* ------------ TABLETS (max-width: 992px) ------------ */
+@media (max-width: 992px) {
+
+    .grocery-navbar {
+        flex-direction: column;
+        gap: 20px;
+        padding: 15px;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        margin-top: 0;
+    }
+
+    .search {
+        width: 100%;
+        text-align: center;
+    }
+
+    .navbar-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .hero-section {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .hero-text {
+        max-width: 100%;
+        margin-top: 20px;
+    }
+
+    .hero-image img {
+        max-width: 250px;
+    }
+
+    .category-grid,
+    .product-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
+    .trust-bar {
+        flex-wrap: wrap;
+        gap: 20px;
+        text-align: center;
+    }
+}
+
+/* ------------ MOBILE SCREENS (max-width: 768px) ------------ */
+@media (max-width: 768px) {
+
+    .grocery-navbar {
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .navbar-logo a {
+        font-size: 1.2em;
+    }
+
+    .search input {
+        width: 180px !important;
+    }
+
+    #search-box {
+        width: 90%;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .hero-section {
+        padding-top: 120px; /* navbar overlap fix */
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+
+    .product-card {
+        padding: 10px;
+    }
+
+    footer .footer-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .social-icons,
+    .payment-icons {
+        justify-content: center;
+    }
+
+    .value-prop {
+        max-width: 100%;
+    }
+}
+
+/* ------------ SMALL MOBILE (max-width: 480px) ------------ */                                        
+@media (max-width: 480px) {
+
+    .grocery-navbar {
+        padding: 8px;
+    }
+
+    .search input {
+        width: 150px !important;
+        padding: 8px;
+    }
+
+    .search button {
+        padding: 8px;
+    }
+
+    .nav-item span {
+        font-size: 0.75em;
+    }
+
+    .nav-item i {
+        font-size: 1em;
+    }
+
+    .hero-text h1 {
+        font-size: 1.8em;
+    }
+
+    .hero-image img {
+        max-width: 200px;
+    }
+
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #search-box {
+        width: 95%;
+    }
+
+    .modal-content {
+        width: 90% !important;
+        margin-top: 30%;
+    }
+}
+
+/* ------------ EXTRA SMALL (360px phones) ------------ */
+@media (max-width: 360px) {
+    .search input {
+        width: 130px !important;
+    }
+
+    .navbar-links {
+        gap: 8px;
+    }
+
+    .product-card h3 {
+        font-size: 0.9em;
+    }
+
+    .product-image {
+        height: 120px;
+    }
+}
+
+    </style>
+</head>
+<body>
+
+<header class="grocery-navbar">
+    <div class="navbar-logo">
+        <a href="#">FreshCart 🛒</a>
+    </div>
+    <div class="search">
+<div style="text-align:center; margin: 20px 0;">
+  <input type="text" id="search-input" placeholder="Search produce..." 
+          style="padding:10px 15px; width:250px; border-radius:8px; border:1px solid #ccc;">
+           <button id="search-btn" 
+          style="padding:10px 15px; border:none; border-radius:8px; background-color:#007bff; color:white; cursor:pointer;">
+    <i class="fas fa-search"></i> Search
+  </button>
+
+          <div id="productContainer"></div>
+</div>
+</div>
+    <nav class="navbar-links">
+        <a href="i.html" class="nav-item">
+            <i class="fas fa-list-alt"></i>
+            <span>Aisles</span>
+        </a>
+        <a href="deal.html" class="nav-item">
+            <i class="fas fa-tag"></i>
+            <span>Deals</span>
+        </a>
+        <a href="location.html" class="nav-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>Location</span>
+        </a>
+        
+        <div class="account-dropdown-container">
+            <a href="#" id="account-icon-btn" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Account</span>
+            </a>
+
+            <div class="dropdown-menu" id="account-dropdown">
+                <a href="#" class="dropdown-link login-link">Login / Register</a>
+              <a href="past.html" class="dropdown-link">Past Orders</a>
+            <a href="#" class="dropdown-link" id="myOrdersBtn">My Orders</a>
+
+              <div id="myListPopup" class="modal">
+                <div class="modal-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
+                  <span class="close-btn" id="closeMyList">&times;</span>
+                  <div class="modal-header">
+                    <h2>🛍️ My Orders</h2>
+                  </div>
+                  <div id="ordersList" style="text-align: left;">
+                    <p>Loading past orders...</p>
+                  </div>
+                  <button id="closeMyListBottom" style="margin-top:15px; background-color:#4caf50; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer;">Close</button>
+                </div>
+              </div>
+
+
+                <a href="#" class="dropdown-link signout-link" style="display: none;">Sign Out</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="navbar-cart">
+        <button class="cart-btn">
+            <i class="fas fa-shopping-basket"></i>
+            <span class="cart-count">3</span>
+        </button>
+    </div>
+</header>
+
+
+<div id="login-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <div class="modal-header">
+            <h2 id="modal-title">Log In to FreshCart</h2>
+        </div>
+        
+        <form id="login-form" class="auth-form">
+            <label for="login-email">Email:</label>
+            <input type="email" id="login-email" required>
+            
+            <label for="login-password">Password:</label>
+            <input type="password" id="login-password" required>
+            
+            <button type="submit" class="auth-submit-btn">Log In</button>
+            <p class="switch-link">
+                Don't have an account? <a href="#" id="show-register">Register here</a>
+            </p>
+        </form>
+
+        <form id="register-form" class="auth-form hidden">
+            <label for="reg-name">Full Name:</label>
+            <input type="text" id="reg-name" required>
+            
+            <label for="reg-email">Email:</label>
+            <input type="email" id="reg-email" required>
+            
+            <label for="reg-password">Password:</label>
+            <input type="password" id="reg-password" required>
+            
+            <button type="submit" class="auth-submit-btn">Register</button>
+            <p class="switch-link">
+                Already have an account? <a href="#" id="show-login">Log in here</a>
+            </p>
+        </form>
+    </div>
+</div>
+<main class="container">
+    
+    <section class="hero-section" >
+        <div class="hero-text" style="margin-top:50px">
+            <h1>Fresh Groceries, Delivered Fast 🚀</h1>
+            <p>Order quality fruits, vegetables, dairy, and household essentials right to your door in under an hour. Skip the lines, save your time!</p>
+            <a href="i.html" class="shop-now-btn">Start Shopping Now</a>
+        </div>
+        <div class="hero-image">
+            <img src="https://png.pngtree.com/png-vector/20231116/ourmid/pngtree-assorted-grocery-products-arranged-on-a-white-png-image_10536690.png" alt="A basket full of fresh groceries" />
+        </div>
+    </section>
+
+    <section class="quick-categories">
+        <h2>Shop By Department</h2>
+        <div class="category-grid">
+            <a href="i.html?category=produce" class="category-card">
+                <i class="fas fa-carrot"></i>
+                <h3>Produce</h3>
+                <p>Fruits & Veggies</p>
+            </a>
+            <a href="i.html?category=dairy" class="category-card">
+                <i class="fas fa-cheese"></i>
+                <h3>Dairy & Eggs</h3>
+                <p>Milk, Yogurt, Cheese</p>
+            </a>
+            <a href="i.html?category=bakery" class="category-card">
+                <i class="fas fa-bread-slice"></i>
+                <h3>Bakery</h3>
+                <p>Fresh Bread & Pastries</p>
+            </a>
+            <a href="i.html?category=household" class="category-card">
+                <i class="fas fa-toilet-paper"></i>
+                <h3>Household</h3>
+                <p>Cleaning & Essentials</p>
+            </a>
+        </div>
+    </section>
+    
+    <section class="featured-products">
+        <h2>Weekly Super Deals 🔥</h2>
+        <div class="product-grid">
+            
+            <div class="product-card" data-product="Avocado">
+                <img src="https://tse2.mm.bing.net/th/id/OIP.zK5HIlenOMUVJkWsNu0pHAHaGA?cb=12&w=1208&h=980&rs=1&pid=ImgDetMain&o=7&rm=3" alt="Fresh Avocado" class="product-image">
+                <h3>Ripe Avocado 🥑</h3>
+                <p class="price">$1.50 / pc</p>
+                <button class="add-to-cart-btn">Add to Cart</button>
+            </div>
+
+            <div class="product-card" data-product="Milk">
+                <img src="https://th.bing.com/th/id/OIP.1_Fkff6qrCtt8axwnWXO6gHaD4?w=343&h=180&c=7&r=0&o=7&cb=12&pid=1.7&rm=3" alt="Gallon of Milk" class="product-image">
+                <h3>Organic Milk (Gal)</h3>
+                <p class="price">$4.99</p>
+                <button class="add-to-cart-btn">Add to Cart</button>
+            </div>
+
+            <div class="product-card" data-product="Cereal">
+                <img src="https://th.bing.com/th/id/OIP.QeR6KRkvJUE22k72lNg2yQHaEK?w=285&h=180&c=7&r=0&o=7&cb=12&pid=1.7&rm=3" alt="Breakfast Cereal Box" class="product-image">
+                <h3>Family Cereal Box</h3>
+                <p class="price">$3.75</p>
+                <button class="add-to-cart-btn">Add to Cart</button>
+            </div>
+            
+        </div>
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="deal.html" class="view-all-btn">View All Deals</a>
+        </div>
+    </section>
+    
+    <section class="trust-bar">
+        <div class="value-prop">
+            <i class="fas fa-truck-fast"></i>
+            <h4>Fast Delivery</h4>
+            <p>Guaranteed within 60 minutes.</p>
+        </div>
+        <div class="value-prop">
+            <i class="fas fa-seedling"></i>
+            <h4>Farm Fresh</h4>
+            <p>Locally sourced produce only.</p>
+        </div>
+        <div class="value-prop">
+            <i class="fas fa-lock"></i>
+            <h4>Secure Payment</h4>
+            <p>100% protected checkout.</p>
+        </div>
+    </section>
+
+</main>
+<footer>
+    <div class="container footer-grid">
+        
+        <div class="footer-col footer-contact">
+            <h3>FreshCart 🛒</h3>
+            <p class="mission">
+                Delivering farm-fresh quality and speed to your doorstep, making grocery shopping effortless.
+            </p>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+
+        <div class="footer-col">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="#">Shop Aisles</a></li>
+                <li><a href="#">Today's Deals</a></li>
+                <li><a href="#">Gift Cards</a></li>
+                <li><a href="#">Recipes & Tips</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h4>Support</h4>
+            <ul>
+                <li><a href="#">Contact Us</a></li>
+                <li><a href="#">FAQs</a></li>
+                <li><a href="#">Shipping & Returns</a></li>
+                <li><a href="#">Account Login</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col footer-newsletter">
+            <h4>Stay Connected</h4>
+            <p>Get exclusive deals and updates straight to your inbox.</p>
+            <form class="newsletter-form">
+                <input type="email" placeholder="Enter your email" required>
+                <button type="submit">Subscribe</button>
+            </form>
+            
+            <div class="payment-icons">
+                <i class="fab fa-cc-visa"></i>
+                <i class="fab fa-cc-mastercard"></i>
+                <i class="fab fa-cc-paypal"></i>
+            </div>
+        </div>
+
+    </div>
+    
+    <div class="footer-bottom">
+        <div class="container">
+            <p>&copy; 2025 FreshCart E-commerce. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Use</a></p>
+        </div>
+    </div>
+</footer>
+
+<!-- PAYMENT MODAL (added) -->
+<div id="paymentModal" class="modal">
+  <div class="modal-content" style="max-width:500px;">
+    <span class="close-btn" id="paymentClose">&times;</span>
+    <h2>Payment Options</h2>
+
+    <p><b>Select Payment Method:</b></p>
+
+    <button id="codPayBtn" 
+      style="background:#28a745;color:white;padding:10px 15px;border:none;border-radius:8px;width:100%;margin:10px 0;">
+      Cash on Delivery 💵
+    </button>
+
+    <button id="onlinePayBtn"
+      style="background:#007bff;color:white;padding:10px 15px;border:none;border-radius:8px;width:100%;margin:10px 0;">
+      Pay Online 💳
+    </button>
+
+    <div id="onlinePayForm" style="display:none; margin-top:15px;">
+        <label>Card Number</label>
+        <input type="text" id="cardNum" placeholder="1234 5678 9012 3456"
+               style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;"><br><br>
+
+        <label>CVV</label>
+        <input type="password" id="cvv" placeholder="***"
+               style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;"><br><br>
+
+        <button id="payNowBtn"
+          style="background:#28a745;color:white;padding:10px 15px;border:none;border-radius:8px;width:100%;">
+          Pay Now ✔
+        </button>
+    </div>
+  </div>
+</div>
+
+<script>
+/************************ LOGIN + DROPDOWN SYSTEM ************************/
+document.addEventListener("DOMContentLoaded", function () {
+    let isLoggedIn = false;
+    const accountButton = document.getElementById("account-icon-btn");
+    const dropdownMenu = document.getElementById("account-dropdown");
+    const loginLink = document.querySelector(".login-link");
+    const signoutLink = document.querySelector(".signout-link");
+    const accountSpan = accountButton.querySelector("span");
+    const loginModal = document.getElementById("login-modal");
+    const closeModalBtn = loginModal.querySelector(".close-btn");
+    const loginForm = document.getElementById("login-form");
+    
+    function updateAccountUI(name="Account"){
+        accountSpan.textContent=name;
+        loginLink.style.display=isLoggedIn?"none":"block";
+        signoutLink.style.display=isLoggedIn?"block":"none";
+    }
+
+    accountButton.onclick=()=>dropdownMenu.classList.toggle("active");
+    loginLink.onclick=e=>{
+        e.preventDefault();
+        loginModal.style.display="block";
+        dropdownMenu.classList.remove("active");
+    };
+
+    loginForm.onsubmit=e=>{
+        e.preventDefault();
+        isLoggedIn=true;
+        updateAccountUI("User");
+        loginModal.style.display="none";
+    };
+
+    signoutLink.onclick=()=>{ isLoggedIn=false; updateAccountUI(); }
+    closeModalBtn.onclick=()=>loginModal.style.display="none";
+    window.onclick=e=>{ if(e.target===loginModal)loginModal.style.display="none" }
+    updateAccountUI();
+});
+
+/**************************** CART + SEARCH + ORDER SYSTEM (NEW) ****************************/
+
+/* ---------- State ---------- */
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+/* ---------- Utility: update cart badge ---------- */
+function updateCartCount() {
+    const badge = document.querySelector(".cart-count");
+    const totalQty = cart.reduce((s,i)=>s + (i.quantity||0),0);
+    if (badge) badge.textContent = totalQty;
+}
+updateCartCount();
+
+/* ---------- Add to Cart function used by search results and product cards ---------- */
+function addItem(name,price){
+    let item = cart.find(i=>i.name===name);
+    if(item) item.quantity++;
+    else cart.push({name,price,quantity:1});
+    localStorage.setItem("cart",JSON.stringify(cart));
+    updateCartCount();
+    alert(`🛒 ${name} added to cart`);
+}
+
+/* ---------- SEARCH RESULT BOX ---------- */
+const searchInput=document.getElementById("search-input");
+const searchBtn=document.getElementById("search-btn");
+
+const resultsBox=document.createElement("div");
+resultsBox.id="search-box";
+resultsBox.style.cssText=`
+position:fixed;top:85px;left:50%;transform:translateX(-50%);
+width:75%;max-height:70vh;background:white;overflow-y:auto;
+padding:15px;border-radius:10px;display:none;z-index:3000;
+box-shadow:0 3px 12px rgba(0,0,0,.2);
+`;
+document.body.appendChild(resultsBox);
+
+/* ---------- SEARCHING PRODUCTS (calls backend) ---------- */
+async function searchProducts(){
+    let q=searchInput.value.trim().toLowerCase();
+    resultsBox.innerHTML="";
+    if(!q){ resultsBox.style.display="none"; return; }
+
+    try{
+        let res=await fetch("http://localhost:5000/products");
+        let data=await res.json();
+        let match=data.filter(p=>p.name.toLowerCase().includes(q));
+
+        if(match.length===0){
+            resultsBox.innerHTML=`<p style="text-align:center">No results for <b>${q}</b></p>`;
+        } else {
+             resultsBox.innerHTML+=`
+               <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+<button id="finishOrderBtn" 
+style="background:#28a745;color:white;padding:7px 14px;border-radius:6px;cursor:pointer;">
+Finish Order 🧾
+</button>
+</div>`;
+            match.forEach(p=>{
+                resultsBox.innerHTML+=`
+                <div style="display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding:10px;">
+                    <div style="display:flex;gap:15px;">
+                        <img src="${p.image_url}" width="75" height="75" style="border-radius:6px;">
+                        <div><h3>${p.name}</h3><p>$${p.price.toFixed(2)}</p></div>
+                    </div>
+
+                    <button onclick="addItem('${p.name}',${p.price})"
+                            style="background:#007bff; width:120px;height:50px;color:white;padding:7px 5px;border-radius:6px">
+                            Add to Cart
+                    </button>
+                </div>`;
+            })
+        }
+        resultsBox.style.display="block";
+    } catch (err){
+        resultsBox.innerHTML="<p style='color:red'>Server error</p>";
+        resultsBox.style.display="block";
+        console.error(err);
+    }
+}
+
+searchBtn.onclick=searchProducts;
+searchInput.onkeypress=e=>{ if(e.key==="Enter")searchProducts(); }
+document.addEventListener('click', function(e){ if(!resultsBox.contains(e.target) && e.target!==searchInput) resultsBox.style.display="none"; });
+
+/* ---------- Add + / - quantity buttons to product cards (keeps UI & images intact) ---------- */
+document.querySelectorAll(".product-card").forEach(card=>{
+    const name = card.dataset.product || card.querySelector("h3")?.textContent?.trim();
+    const priceText = card.querySelector(".price")?.textContent || "";
+    const price = parseFloat(priceText.replace(/[^0-9.]/g,"")) || 0;
+
+    // create controls
+    const controls = document.createElement("div");
+    controls.style = "display:flex;gap:8px;justify-content:center;align-items:center;margin-top:8px;";
+
+    const minus = document.createElement("button");
+    minus.textContent = "-";
+    minus.style = "width:30px;height:30px;border-radius:6px;";
+    minus.onclick = (ev) => {
+        ev.stopPropagation();
+        let item = cart.find(i=>i.name===name);
+        if(item){
+            item.quantity--;
+            if(item.quantity<=0) cart = cart.filter(i=>i.name!==name);
+            localStorage.setItem("cart",JSON.stringify(cart));
+            updateCartCount();
+        }
+    };
+
+    const plus = document.createElement("button");
+    plus.textContent = "+";
+    plus.style = "width:30px;height:30px;border-radius:6px;";
+    plus.onclick = (ev) => { ev.stopPropagation(); addItem(name,price); };
+
+    controls.appendChild(minus);
+    controls.appendChild(plus);
+    // append after the add-to-cart button
+    const addBtn = card.querySelector(".add-to-cart-btn");
+    if(addBtn) addBtn.insertAdjacentElement('afterend', controls);
+});
+
+/* ---------- PAYMENT & ORDER LOGIC ---------- */
+const paymentModal = document.getElementById("paymentModal");
+const paymentClose = document.getElementById("paymentClose");
+const codPayBtn = document.getElementById("codPayBtn");
+const onlinePayBtn = document.getElementById("onlinePayBtn");
+const onlinePayForm = document.getElementById("onlinePayForm");
+const payNowBtn = document.getElementById("payNowBtn");
+
+if(paymentClose) paymentClose.onclick = ()=> paymentModal.style.display = "none";
+window.onclick = (e)=> { if(e.target === paymentModal) paymentModal.style.display = "none"; };
+
+/* When Finish Order button (in search results) clicked -> open payment modal */
+document.addEventListener("click", function (e) {
+    if (e.target.id === "finishOrderBtn") {
+
+        // 🔥 FIX: HIDE SEARCH RESULTS IMMEDIATELY
+        if (typeof resultsBox !== "undefined") {
+            resultsBox.style.display = "none";
+        }
+        if (typeof searchInput !== "undefined") {
+            searchInput.value = "";
+        }
+
+        // If no items → exit
+        if (cart.length === 0) {
+            alert("❗Cart Empty - Add items first!");
+            return;
+        }
+
+        // 🔥 Open payment modal
+        paymentModal.style.display = "block";
+    }
+});
+
+/* Helper to generate order id */
+function generateOrderId(){
+    const history = JSON.parse(localStorage.getItem("myList")) || [];
+    return "FC-" + new Date().getFullYear() + "-" + String(history.length + 1).padStart(3,"0");
+}
+function completeFinalOrder(paymentType) {
+
+    if (cart.length === 0) {
+        alert("Cart is empty");
+        return;
+    }
+
+    let total = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+
+    let orderHistory = JSON.parse(localStorage.getItem("myList")) || [];
+
+    let orderId = "FC-" + new Date().getTime();
+
+    let newOrder = {
+        id: orderId,
+        date: new Date().toLocaleString(),
+        payment: paymentType,
+        status: "Order Placed",
+        items: cart.map(i => ({
+            name: i.name,
+            quantity: i.quantity,
+            price: i.price
+        })),
+        total: total
+    };
+
+    // ✅ SAVE ORDER
+    orderHistory.push(newOrder);
+    localStorage.setItem("myList", JSON.stringify(orderHistory));
+
+    // ✅ SAVE LATEST ORDER
+    localStorage.setItem("currentOrder", JSON.stringify(newOrder));
+
+    // ✅ CLEAR CART
+    cart = [];
+    localStorage.removeItem("cart");
+    updateCartCount();
+
+    alert("🎉 Order placed successfully!");
+
+    // ✅ GO TO HOME PAGE
+    window.location.href = "index.html";
+}
+
+
+
+/* COD */
+if(codPayBtn) codPayBtn.onclick = ()=> completeFinalOrder("Cash on Delivery");
+/* Online open simple fields */
+if(onlinePayBtn) onlinePayBtn.onclick = ()=> { if(onlinePayForm) onlinePayForm.style.display = "block"; };
+/* Pay now - mock validation */
+if(payNowBtn) payNowBtn.onclick = ()=>{
+    const card = document.getElementById("cardNum")?.value?.trim() || "";
+    const cvv = document.getElementById("cvv")?.value?.trim() || "";
+    if(card.length < 12 || cvv.length < 3){ alert("⚠ Enter valid card details"); return; }
+    completeFinalOrder("Online Payment (Mock)");
+};
+
+/* ---------- MY ORDERS & PAST ORDERS UI ---------- */
+const myOrdersBtn = document.getElementById("myOrdersBtn");
+const myListBtn = document.getElementById("myListBtn");
+const myListPopup = document.getElementById("myListPopup");
+const ordersList = document.getElementById("ordersList");
+
+if(myOrdersBtn) myOrdersBtn.onclick = ()=> showMyOrder();
+if(myListBtn) myListBtn.onclick = ()=> { myListPopup.style.display = "flex"; loadPastOrders(); };
+if(document.getElementById("closeMyList")) document.getElementById("closeMyList").onclick =
+document.getElementById("closeMyListBottom").onclick = ()=> myListPopup.style.display = "none";
+
+/* Show only latest order */
+function showMyOrder() {
+
+    const popup = document.getElementById("myListPopup");
+    const ordersList = document.getElementById("ordersList");
+
+    let order = JSON.parse(localStorage.getItem("currentOrder"));
+
+    popup.style.display = "flex";
+
+    if (!order) {
+        ordersList.innerHTML = "<p>No orders yet.</p>";
+        return;
+    }
+
+    ordersList.innerHTML = `
+        <h3>🍓 My Latest Order</h3>
+        <p><b>Order ID:</b> ${order.id}</p>
+        <p><b>Date:</b> ${order.date}</p>
+        <p><b>Status:</b> ${order.status}</p>
+        <p><b>Payment:</b> ${order.payment}</p>
+        <hr>
+
+        ${order.items.map(item => `
+            <div style="display:flex;justify-content:space-between;">
+                <span>${item.name} × ${item.quantity}</span>
+                <span>$${(item.price * item.quantity).toFixed(2)}</span>
+            </div>
+        `).join("")}
+
+        <hr>
+        <b>Total: $${order.total.toFixed(2)}</b>
+    `;
+}
+
+
+
+/* Tracking UI */
+function trackingHTML(status){
+    const stages = ["Order Placed","Packed","Out for Delivery","Delivered"];
+    return `<div style="display:flex;gap:8px;flex-wrap:wrap;">` + stages.map(s=>{
+        const active = stages.indexOf(s) <= stages.indexOf(status);
+        return `<div style="padding:8px 12px;border-radius:8px;border:1px solid ${active? '#28a745':'#ddd'};background:${active? 'rgba(40,167,69,0.08)':'#fff'}">${s}</div>`;
+    }).join("") + `</div>`;
+}
+
+/* Order action handlers */
+document.addEventListener("click", function(e){
+    const curr = JSON.parse(localStorage.getItem("currentOrder"));
+    let history = JSON.parse(localStorage.getItem("myList")) || [];
+
+    if(!curr) {
+        // nothing active to act on (except past orders handling)
+    } else {
+        if(e.target && e.target.id === "advanceStatusBtn"){
+            const seq = ["Order Placed","Packed","Out for Delivery","Delivered"];
+            let idx = seq.indexOf(curr.status||"Order Placed");
+            if(idx < seq.length -1) curr.status = seq[idx+1];
+            localStorage.setItem("currentOrder", JSON.stringify(curr));
+            // update last matching history item
+            for(let i = history.length-1;i>=0;i--){ if(history[i].id===curr.id){ history[i].status = curr.status; break; } }
+            localStorage.setItem("myList", JSON.stringify(history));
+            showMyOrder();
+        }
+
+        if(e.target && e.target.id === "markDeliveredBtn"){
+            curr.status = "Delivered";
+            localStorage.setItem("currentOrder", JSON.stringify(curr));
+            for(let i = history.length-1;i>=0;i--){ if(history[i].id===curr.id){ history[i].status = "Delivered"; break; } }
+            localStorage.setItem("myList", JSON.stringify(history));
+            showMyOrder();
+        }
+
+        if(e.target && e.target.id === "cancelOrderBtn"){
+            if(confirm("Are you sure you want to cancel this order?")){
+                // mark history entry cancelled
+                for(let i = history.length-1;i>=0;i--){ if(history[i].id===curr.id){ history[i].status = "Cancelled"; break; } }
+                localStorage.setItem("myList", JSON.stringify(history));
+                localStorage.removeItem("currentOrder");
+                ordersList.innerHTML = "<p>No active order found.</p>";
+                alert("❌ Order Cancelled");
+            }
+        }
+    }
+
+    // Past orders: view specific entry (delegated)
+    if(e.target && e.target.classList && e.target.classList.contains("view-past-order-btn")){
+        const id = e.target.dataset.id;
+        const hist = JSON.parse(localStorage.getItem("myList")) || [];
+        const found = hist.find(x => x.id === id);
+        if(found){
+            ordersList.innerHTML = `
+                <div style="border:1px solid #ddd;padding:12px;border-radius:8px;">
+                    <h3>Order ${found.id}</h3>
+                    <p><b>Date:</b> ${found.date}</p>
+                    <p><b>Payment:</b> ${found.payment}</p>
+                    <p><b>Status:</b> ${found.status}</p>
+                    <hr>
+                    ${found.items.map(i=>`<div style="display:flex;justify-content:space-between;padding:6px 0;"><div>${i.name} x ${i.quantity}</div><div>$${(i.price*i.quantity).toFixed(2)}</div></div>`).join("")}
+                    <hr>
+                    <p><b>Total: $${found.total.toFixed(2)}</b></p>
+                    <button id="backToList" style="padding:8px 10px;border-radius:6px;margin-top:8px;">Back</button>
+                </div>
+            `;
+            document.getElementById("backToList").onclick = loadPastOrders;
+        }
+    }
+
+});
+
+/* Load past orders into popup */
+function loadPastOrders(){
+    const history = JSON.parse(localStorage.getItem("myList")) || [];
+    ordersList.innerHTML = "";
+    if(history.length === 0){ ordersList.innerHTML = "<p>No past orders yet</p>"; return; }
+    history.slice().reverse().forEach(o=>{
+        ordersList.innerHTML += `
+            <div style="border:1px solid #ddd;padding:10px;margin-bottom:10px;border-radius:8px;">
+                <b>${o.id}</b> &nbsp; <small>${o.date}</small><br>
+                Payment: ${o.payment || "-"} <br>
+                Status: ${o.status || "-"} <br>
+                Total: $${o.total.toFixed(2)}
+                <div style="margin-top:8px;">
+                    <button class="view-past-order-btn" data-id="${o.id}" style="padding:6px 8px;border-radius:6px;">View</button>
+                </div>
+            </div>
+        `;
+    });
+
+    // attach view handlers are handled via event delegation above
+}
+
+/* Initial badge update (in case cart already existed) */
+updateCartCount();
+
+</script>
+</body>
+</html>

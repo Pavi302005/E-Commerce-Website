@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Orders 🧾</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f8f8f8;
+        padding: 20px;
+        max-width: 900px;
+        margin: auto;
+    }
+
+    h1 {
+        color: #007bff;
+        text-align: center;
+    }
+
+    .order-card {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        border-bottom: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background: #f1f1f1;
+    }
+
+    .total {
+        text-align: right;
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+    .empty {
+        text-align: center;
+        color: #666;
+        margin-top: 50px;
+    }
+
+    a {
+        display: inline-block;
+        margin-bottom: 20px;
+        text-decoration: none;
+        color: #007bff;
+        font-weight: bold;
+    }
+</style>
+</head>
+
+<body>
+
+<a href="javascript:history.back()">← Back to Shop</a>
+<h1>🧾 My Past Orders</h1>
+
+<div id="orders"></div>
+<div style="text-align:center;margin-top:20px;">
+    <button onclick="clearOrders()"
+        style="padding:10px 15px;border-radius:8px;border:none;background:#dc3545;color:white;">
+        Clear Order History ❌
+    </button>
+</div>
+
+
+<script>
+const ordersContainer = document.getElementById('orders');
+const orders = JSON.parse(localStorage.getItem('myList')) || [];
+
+if (orders.length === 0) {
+    ordersContainer.innerHTML = `<p class="empty">No orders placed yet 🛒</p>`;
+} else {
+    orders.reverse().forEach((order, index) => {
+        let html = `
+            <div class="order-card">
+                <div class="order-header">
+                    <span>Order #${index + 1}</span>
+                    <span>${order.orderDate}</span>
+                </div>
+
+                <p><strong>Payment:</strong> ${order.paymentMethod}</p>
+
+                <table>
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                    </tr>
+        `;
+
+        order.items.forEach(item => {
+            html += `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>${item.quantity}</td>
+                    <td>$${(item.price * item.quantity).toFixed(2)}</td>
+                </tr>
+            `;
+        });
+
+        html += `
+                </table>
+                <div class="total">Total: $${order.total.toFixed(2)}</div>
+            </div>
+        `;
+
+        ordersContainer.innerHTML += html;
+    });
+}
+function clearOrders(){
+    if(confirm("Are you sure you want to delete all past orders?")){
+        localStorage.removeItem("myList");
+        location.reload();
+    }
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,176 @@
+/* ------------------------------------- */
+/* --- FOOTER STYLES --- */
+/* ------------------------------------- */
+
+footer {
+    background-color: #264653; /* Darker blue/grey for footer contrast */
+    color: #f7fff7;
+    padding-top: 50px;
+    font-size: 0.9em;
+}
+
+.footer-grid {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-col {
+    flex-basis: 25%;
+}
+
+.footer-col h3,
+.footer-col h4 {
+    color: #2a9d8f; /* Primary green accent */
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+}
+
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-col li {
+    margin-bottom: 10px;
+}
+
+.footer-col a {
+    color: #ccc;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-col a:hover {
+    color: #e9c46a; /* Gold hover accent */
+}
+
+/* Social Icons */
+.social-icons {
+    margin-top: 20px;
+}
+
+.social-icons a {
+    color: #f7fff7;
+    font-size: 1.5em;
+    margin-right: 15px;
+    transition: color 0.3s;
+}
+
+.social-icons a:hover {
+    color: #e76f51; /* Orange accent on hover */
+}
+
+/* Newsletter Form */
+.newsletter-form {
+    display: flex;
+    margin-top: 15px;
+}
+
+.newsletter-form input {
+    padding: 10px;
+    border: none;
+    border-radius: 5px 0 0 5px;
+    outline: none;
+    flex-grow: 1;
+}
+
+.newsletter-form button {
+    background-color: #e76f51;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.newsletter-form button:hover {
+    background-color: #f4a261;
+}
+
+/* Payment Icons */
+.payment-icons {
+    margin-top: 20px;
+}
+
+.payment-icons i {
+    font-size: 2.2em;
+    margin-right: 10px;
+    color: #ccc;
+}
+
+/* Footer Bottom */
+.footer-bottom {
+    background-color: #1d3542; /* Even darker shade */
+    text-align: center;
+    padding: 15px 0;
+    color: #aaa;
+}
+
+.footer-bottom a {
+    color: #aaa;
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.footer-bottom a:hover {
+    text-decoration: underline;
+}
+@media (max-width: 768px) {
+    .footer-grid {
+        flex-wrap: wrap;
+        flex-direction: column;
+        text-align: center;
+        gap: 40px;
+    }
+    
+    .footer-col {
+        flex-basis: 100%;
+    }
+
+    .footer-col ul {
+        margin: 0 auto; 
+        max-width: 250px;
+    }
+    
+    .social-icons {
+        justify-content: center;
+        display: flex;
+    }
+    
+    .newsletter-form {
+        max-width: 300px;
+        margin: 15px auto 0;
+    }
+}
+/* Custom styles for the dedicated Aisle page */
+.page-header {
+    text-align: center;
+    color: #264653;
+    font-size: 2.5em;
+    margin-bottom: 40px;
+}
+
+.aisle-list {
+    /* Ensures the list wraps neatly on larger screens */
+    justify-content: flex-start;
+}
+
+.aisle-list .category-card {
+    flex-basis: 23%; /* Allows four columns on desktop */
+    margin-bottom: 20px;
+    padding: 30px 15px;
+}
+
+.aisle-footer-cta {
+    text-align: center;
+    margin-top: 50px;
+    padding: 20px;
+    background-color: #e9f7f7;
+    border-radius: 8px;
+    border: 1px dashed #2a9d8f;
+}

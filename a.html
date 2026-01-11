@@ -1,0 +1,751 @@
+]<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshCart Grocery E-commerce</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <style>
+        /* General Setup */
+        body { font-family: sans-serif; margin: 0; background-color: #f7f7f7; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        a { text-decoration: none; color: inherit; }
+
+        /* HEADER & NAVBAR */
+        .grocery-navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 40px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            flex-wrap: wrap; 
+            position:fixed;
+            z-index: 1;
+            width:95%;
+            margin-top:-2%;
+        }
+        .navbar-logo a { font-size: 1.5em; font-weight: bold; color: #28a745; }
+        .navbar-links { display: flex; align-items: center; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; padding: 10px 15px; margin: 0 5px; color: #555; transition: color 0.2s; }
+        .nav-item:hover { color: #007bff; }
+        .nav-item i { font-size: 1.2em; margin-bottom: 3px; }
+        .navbar-cart .cart-btn { background-color: #ffc107; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; color: #333; font-weight: bold; position: relative; }
+        .navbar-cart .cart-count { background-color: #dc3545; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7em; position: absolute; top: -5px; right: -5px; }
+
+        /* ACCOUNT DROPDOWN STYLES (THE FIX) */
+        .account-dropdown-container {
+            position: relative; /* Container for absolute positioning */
+            margin-left: 10px;
+        }
+
+        .dropdown-menu {
+            /* HIDE BY DEFAULT */
+            display: none; 
+            
+            /* POSITIONING AND LAYER */
+            position: absolute;
+            top: 100%; 
+            right: 0;
+            z-index: 1000; /* CRUCIAL: Ensures it sits above other content */
+            
+            /* Appearance */
+            min-width: 180px;
+            background-color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden; 
+            padding: 5px 0;
+            margin-top: 5px;
+        }
+
+        /* JavaScript Toggled Class to SHOW the dropdown */
+        .dropdown-menu.active {
+            display: block;
+        }
+
+        .dropdown-link {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: #333;
+            font-size: 0.95em;
+            cursor: pointer; /* Ensure pointer shows on hover */
+        }
+
+        .dropdown-link:hover {
+            background-color: #f5f5f5;
+            color: #007bff;
+        }
+
+        /* --- MODAL STYLES --- */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 2000; /* Higher than the dropdown */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6); 
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #000;
+            text-decoration: none;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .auth-form label { display: block; margin-top: 10px; font-weight: bold; font-size: 0.9em; }
+        .auth-form input[type="email"],
+        .auth-form input[type="password"],
+        .auth-form input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .auth-submit-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 1em;
+            transition: background-color 0.2s;
+        }
+        .auth-submit-btn:hover { background-color: #218838; }
+        .switch-link { text-align: center; margin-top: 15px; font-size: 0.9em; }
+        .switch-link a { color: #007bff; text-decoration: underline; cursor: pointer; }
+        .auth-form.hidden { display: none; }
+        .hero-section { display: flex; justify-content: space-between; align-items: center; background-color: #e9f7ef; padding: 40px; border-radius: 10px; margin-top: 30px; }
+        .hero-text { max-width: 50%; }
+        .hero-text h1 { font-size: 2.5em; color: #28a745; margin-bottom: 10px; }
+        .shop-now-btn { display: inline-block; background-color: #ffc107; color: #333; padding: 12px 25px; border-radius: 5px; margin-top: 20px; font-weight: bold; transition: background-color 0.2s; }
+        .shop-now-btn:hover { background-color: #e0a800; }
+        .hero-image img { max-width: 350px; height: auto; }
+
+        .quick-categories, .featured-products, .trust-bar { margin: 40px 0; }
+        .category-grid, .product-grid { display: grid; gap: 20px; }
+        .category-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); text-align: center; }
+        .category-card { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); transition: transform 0.2s; }
+        .category-card:hover { transform: translateY(-5px); }
+        .category-card i { font-size: 2em; color: #28a745; margin-bottom: 10px; }
+        
+        .product-grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+        .product-card { background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); padding: 15px; text-align: center; }
+        .product-image { width: 100%; height: 150px; object-fit: contain; border-radius: 5px; margin-bottom: 10px; }
+        .product-card h3 { margin: 10px 0; font-size: 1.1em; }
+        .product-card .price { color: #dc3545; font-weight: bold; margin-bottom: 10px; }
+        .add-to-cart-btn { background-color: #007bff; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; }
+        .add-to-cart-btn:hover { background-color: #0056b3; }
+        .view-all-btn { display: inline-block; background-color: #007bff; color: white; padding: 10px 20px; border-radius: 5px; font-weight: bold; }
+
+        .trust-bar { display: flex; justify-content: space-around; background-color: #fff; padding: 30px 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); }
+        .value-prop { text-align: center; max-width: 250px; }
+        .value-prop i { font-size: 2em; color: #28a745; margin-bottom: 10px; }
+        .value-prop h4 { margin: 0; }
+        .value-prop p { margin-top: 5px; font-size: 0.9em; color: #666; }
+
+        /* Footer */
+        footer { background-color: #343a40; color: white; padding-top: 40px; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; padding-bottom: 30px; }
+        .footer-col h3, .footer-col h4 { border-bottom: 2px solid #28a745; padding-bottom: 5px; margin-bottom: 15px; }
+        .footer-col ul { list-style: none; padding: 0; }
+        .footer-col ul li { margin-bottom: 8px; }
+        .footer-col ul li a:hover { color: #ffc107; }
+        .social-icons a { color: white; font-size: 1.5em; margin-right: 15px; transition: color 0.2s; }
+        .social-icons a:hover { color: #007bff; }
+        .newsletter-form input { padding: 10px; border: none; border-radius: 5px 0 0 5px; }
+        .newsletter-form button { padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 0 5px 5px 0; cursor: pointer; margin-left: -4px; }
+        .payment-icons i { font-size: 1.8em; margin-top: 15px; margin-right: 10px; }
+        .footer-bottom { border-top: 1px solid #495057; padding: 15px 0; text-align: center; font-size: 0.9em; }
+        .footer-bottom a { color: #ffc107; }
+    </style>
+</head>
+<body>
+
+<header class="grocery-navbar">
+    <div class="navbar-logo">
+        <a href="#">FreshCart 🛒</a>
+    </div>
+<div style="text-align:center; margin: 20px 0;">
+  <input type="text" id="search-input" placeholder="Search produce..." 
+          style="padding:10px 15px; width:250px; border-radius:8px; border:1px solid #ccc;">
+          <div id="productContainer"></div>
+<div id="orderList"></div>
+  <button id="search-btn" 
+          style="padding:10px 15px; border:none; border-radius:8px; background-color:#007bff; color:white; cursor:pointer;">
+    <i class="fas fa-search"></i> Search
+  </button>
+</div>
+
+    <nav class="navbar-links">
+        <a href="i.html" class="nav-item">
+            <i class="fas fa-list-alt"></i>
+            <span>Aisles</span>
+        </a>
+        <a href="deal.html" class="nav-item">
+            <i class="fas fa-tag"></i>
+            <span>Deals</span>
+        </a>
+        <a href="location.html" class="nav-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>Location</span>
+        </a>
+        
+        <div class="account-dropdown-container">
+            <a href="#" id="account-icon-btn" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Account</span>
+            </a>
+
+            <div class="dropdown-menu" id="account-dropdown">
+                <a href="#" class="dropdown-link login-link">Login / Register</a>
+              <a href="#" class="dropdown-link" id="myListBtn">Past Orders</a>
+            
+              <div id="myListPopup" class="modal">
+                <div class="modal-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
+                  <span class="close-btn" id="closeMyList">&times;</span>
+                  <div class="modal-header">
+                    <h2>🛍️ My Orders</h2>
+                  </div>
+                  <div id="ordersList" style="text-align: left;">
+                    <p>Loading past orders...</p>
+                  </div>
+                  <button id="closeMyListBottom" style="margin-top:15px; background-color:#4caf50; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer;">Close</button>
+                </div>
+              </div>
+
+
+                <a href="#" class="dropdown-link signout-link" style="display: none;">Sign Out</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="navbar-cart">
+        <button class="cart-btn">
+            <i class="fas fa-shopping-basket"></i>
+            <span class="cart-count">3</span>
+        </button>
+    </div>
+</header>
+
+
+<div id="login-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <div class="modal-header">
+            <h2 id="modal-title">Log In to FreshCart</h2>
+        </div>
+        
+        <form id="login-form" class="auth-form">
+            <label for="login-email">Email:</label>
+            <input type="email" id="login-email" required>
+            
+            <label for="login-password">Password:</label>
+            <input type="password" id="login-password" required>
+            
+            <button type="submit" class="auth-submit-btn">Log In</button>
+            <p class="switch-link">
+                Don't have an account? <a href="#" id="show-register">Register here</a>
+            </p>
+        </form>
+
+        <form id="register-form" class="auth-form hidden">
+            <label for="reg-name">Full Name:</label>
+            <input type="text" id="reg-name" required>
+            
+            <label for="reg-email">Email:</label>
+            <input type="email" id="reg-email" required>
+            
+            <label for="reg-password">Password:</label>
+            <input type="password" id="reg-password" required>
+            
+            <button type="submit" class="auth-submit-btn">Register</button>
+            <p class="switch-link">
+                Already have an account? <a href="#" id="show-login">Log in here</a>
+            </p>
+        </form>
+    </div>
+</div>
+<main class="container">
+    
+    <section class="hero-section" >
+        <div class="hero-text" style="margin-top:50px">
+            <h1>Fresh Groceries, Delivered Fast 🚀</h1>
+            <p>Order quality fruits, vegetables, dairy, and household essentials right to your door in under an hour. Skip the lines, save your time!</p>
+            <a href="i.html" class="shop-now-btn">Start Shopping Now</a>
+        </div>
+        <div class="hero-image">
+            <img src="https://png.pngtree.com/png-vector/20231116/ourmid/pngtree-assorted-grocery-products-arranged-on-a-white-png-image_10536690.png" alt="A basket full of fresh groceries" />
+        </div>
+    </section>
+
+    <section class="quick-categories">
+        <h2>Shop By Department</h2>
+        <div class="category-grid">
+            <a href="i.html?category=produce" class="category-card">
+                <i class="fas fa-carrot"></i>
+                <h3>Produce</h3>
+                <p>Fruits & Veggies</p>
+            </a>
+            <a href="i.html?category=dairy" class="category-card">
+                <i class="fas fa-cheese"></i>
+                <h3>Dairy & Eggs</h3>
+                <p>Milk, Yogurt, Cheese</p>
+            </a>
+            <a href="i.html?category=bakery" class="category-card">
+                <i class="fas fa-bread-slice"></i>
+                <h3>Bakery</h3>
+                <p>Fresh Bread & Pastries</p>
+            </a>
+            <a href="i.html?category=household" class="category-card">
+                <i class="fas fa-toilet-paper"></i>
+                <h3>Household</h3>
+                <p>Cleaning & Essentials</p>
+            </a>
+        </div>
+    </section>
+    
+    <section class="featured-products">
+        <h2>Weekly Super Deals 🔥</h2>
+        <div class="product-grid">
+            
+            <div class="product-card" data-product="Avocado">
+                <img src="https://tse2.mm.bing.net/th/id/OIP.zK5HIlenOMUVJkWsNu0pHAHaGA?cb=12&w=1208&h=980&rs=1&pid=ImgDetMain&o=7&rm=3" alt="Fresh Avocado" class="product-image">
+                <h3>Ripe Avocado 🥑</h3>
+                <p class="price">$1.50 / pc</p>
+                <button class="add-to-cart-btn">Add to Cart</button>
+            </div>
+
+            <div class="product-card" data-product="Milk">
+                <img src="https://th.bing.com/th/id/OIP.1_Fkff6qrCtt8axwnWXO6gHaD4?w=343&h=180&c=7&r=0&o=7&cb=12&pid=1.7&rm=3" alt="Gallon of Milk" class="product-image">
+                <h3>Organic Milk (Gal)</h3>
+                <p class="price">$4.99</p>
+                <button class="add-to-cart-btn">Add to Cart</button>
+            </div>
+
+            <div class="product-card" data-product="Cereal">
+                <img src="https://th.bing.com/th/id/OIP.QeR6KRkvJUE22k72lNg2yQHaEK?w=285&h=180&c=7&r=0&o=7&cb=12&pid=1.7&rm=3" alt="Breakfast Cereal Box" class="product-image">
+                <h3>Family Cereal Box</h3>
+                <p class="price">$3.75</p>
+                <button class="add-to-cart-btn">Add to Cart</button>
+            </div>
+            
+        </div>
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="deal.html" class="view-all-btn">View All Deals</a>
+        </div>
+    </section>
+    
+    <section class="trust-bar">
+        <div class="value-prop">
+            <i class="fas fa-truck-fast"></i>
+            <h4>Fast Delivery</h4>
+            <p>Guaranteed within 60 minutes.</p>
+        </div>
+        <div class="value-prop">
+            <i class="fas fa-seedling"></i>
+            <h4>Farm Fresh</h4>
+            <p>Locally sourced produce only.</p>
+        </div>
+        <div class="value-prop">
+            <i class="fas fa-lock"></i>
+            <h4>Secure Payment</h4>
+            <p>100% protected checkout.</p>
+        </div>
+    </section>
+
+</main>
+<footer>
+    <div class="container footer-grid">
+        
+        <div class="footer-col footer-contact">
+            <h3>FreshCart 🛒</h3>
+            <p class="mission">
+                Delivering farm-fresh quality and speed to your doorstep, making grocery shopping effortless.
+            </p>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+
+        <div class="footer-col">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="#">Shop Aisles</a></li>
+                <li><a href="#">Today's Deals</a></li>
+                <li><a href="#">Gift Cards</a></li>
+                <li><a href="#">Recipes & Tips</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h4>Support</h4>
+            <ul>
+                <li><a href="#">Contact Us</a></li>
+                <li><a href="#">FAQs</a></li>
+                <li><a href="#">Shipping & Returns</a></li>
+                <li><a href="#">Account Login</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col footer-newsletter">
+            <h4>Stay Connected</h4>
+            <p>Get exclusive deals and updates straight to your inbox.</p>
+            <form class="newsletter-form">
+                <input type="email" placeholder="Enter your email" required>
+                <button type="submit">Subscribe</button>
+            </form>
+            
+            <div class="payment-icons">
+                <i class="fab fa-cc-visa"></i>
+                <i class="fab fa-cc-mastercard"></i>
+                <i class="fab fa-cc-paypal"></i>
+            </div>
+        </div>
+
+    </div>
+    
+    <div class="footer-bottom">
+        <div class="container">
+            <p>&copy; 2025 FreshCart E-commerce. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Use</a></p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- State Variable ---
+        let isLoggedIn = false; 
+
+        // --- DOM Elements ---
+        const accountButton = document.getElementById('account-icon-btn');
+        const dropdownMenu = document.getElementById('account-dropdown');
+        const loginLink = document.querySelector('.login-link');
+        const signoutLink = document.querySelector('.signout-link');
+        const accountSpan = accountButton.querySelector('span'); 
+        const loginModal = document.getElementById('login-modal');
+        const closeModalBtn = loginModal.querySelector('.close-btn');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const modalTitle = document.getElementById('modal-title');
+        const showRegisterBtn = document.getElementById('show-register');
+        const showLoginBtn = document.getElementById('show-login');
+
+        // --- Utility Functions ---
+
+        function updateAccountUI(name = 'Account') {
+            accountSpan.textContent = name; 
+            if (isLoggedIn) {
+                loginLink.style.display = 'none';
+                signoutLink.style.display = 'block';
+            } else {
+                loginLink.style.display = 'block';
+                signoutLink.style.display = 'none';
+                accountSpan.textContent = 'Account'; 
+            }
+        }
+        
+        function openModal() {
+            loginModal.style.display = 'block';
+            dropdownMenu.classList.remove('active');
+        }
+
+      
+        
+        function showLoginForm() {
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
+            modalTitle.textContent = 'Log In to FreshCart';
+        }
+
+        function showRegisterForm() {
+            loginForm.classList.add('hidden');
+            registerForm.classList.remove('hidden');
+            modalTitle.textContent = 'Register for FreshCart';
+        }
+
+        // --- Event Handlers ---
+
+        // 1. Dropdown Toggle
+        accountButton.addEventListener('click', function(event) {
+            event.preventDefault(); 
+            dropdownMenu.classList.toggle('active');
+        });
+
+        // 2. Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const isClickInside = accountButton.contains(event.target) || dropdownMenu.contains(event.target);
+            if (!isClickInside) {
+                dropdownMenu.classList.remove('active');
+            }
+        });
+
+        // 3. Open Modal from Dropdown
+        loginLink.addEventListener('click', function(event) {
+            event.preventDefault();
+            showLoginForm();
+            openModal();
+        });
+
+        // 4. Handle Login Form Submission (Simulated Login)
+        loginForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const userEmail = document.getElementById('login-email').value;
+            const userName = userEmail.split('@')[0]; 
+
+            isLoggedIn = true;
+            updateAccountUI(userName);
+            closeModal();
+            console.log("Login successful for:", userEmail);
+        });
+
+        // 5. Handle Sign Out
+        signoutLink.addEventListener('click', function(event) {
+            event.preventDefault();
+            isLoggedIn = false;
+            updateAccountUI(); 
+            dropdownMenu.classList.remove('active');
+            console.log("User signed out.");
+        });
+
+        // 6. Modal Controls (Close and Switch)
+        closeModalBtn.addEventListener('click', closeModal);
+        window.addEventListener('click', function(event) {
+            if (event.target === loginModal) {
+                closeModal();
+            }
+        });
+        showRegisterBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            showRegisterForm();
+        });
+        showLoginBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            showLoginForm();
+        });
+        
+        // Initialize UI state on page load
+        updateAccountUI(); 
+    });
+    
+    // ✅ My List Popup Logic
+    const myListBtn = document.getElementById('myListBtn');
+    const myListPopup = document.getElementById('myListPopup');
+    const ordersList = document.getElementById('ordersList');
+    const closeMyList = document.getElementById('closeMyList');
+    const closeMyListBottom = document.getElementById('closeMyListBottom');
+
+    // 💡 FIXED: Function to Show My List Orders (was previously missing)
+
+
+      myList.reverse().forEach((order, index) => { // Display newest first
+        const div = document.createElement('div');
+        div.style.border = '1px solid #ddd';
+        div.style.padding = '15px';
+        div.style.marginBottom = '15px';
+        div.style.borderRadius = '8px';
+        div.style.background = '#f9f9f9';
+        
+        let itemsHtml = order.items.map(item => 
+          `<li style="font-size: 0.9em; margin-bottom: 3px; color: #555;">${item.name} (x${item.quantity}): $${item.price.toFixed(2)}</li>`
+        ).join('');
+
+        div.innerHTML = `
+          <h4 style="margin-top:0; margin-bottom: 5px; color:#007bff;">Order #${myList.length - index} <span style="font-weight: normal; font-size: 0.9em; color: #666;">(${order.orderDate})</span></h4>
+          <ul style="list-style: none; padding: 0; margin: 5px 0 10px 10px;">
+            ${itemsHtml}
+          </ul>
+          <p style="font-weight: bold; margin: 0; border-top: 1px dashed #ccc; padding-top: 5px;">Total Paid: $${order.total.toFixed(2)}</p>
+        `;
+        ordersList.appendChild(div);
+      });
+
+
+    if (myListBtn) {
+      myListBtn.addEventListener('click', (event) => {
+        event.preventDefault();
+        myListPopup.style.display = 'flex';
+      });
+    }
+
+    if (closeMyList || closeMyListBottom) {
+      // Use event delegation or check both IDs
+      [closeMyList, closeMyListBottom].forEach(btn => {
+        if (btn) {
+          btn.addEventListener('click', () => {
+            myListPopup.style.display = 'none';
+          });
+        }
+      });
+    }
+    // Also close if clicked outside the content box
+    myListPopup.addEventListener('click', (e) => {
+      if (e.target === myListPopup) {
+        myListPopup.style.display = 'none';
+      }
+    });
+const searchInput = document.getElementById('search-input');
+const searchBtn = document.getElementById('search-btn');
+
+// 🧊 Create results box
+const resultsContainer = document.createElement('div');
+resultsContainer.id = 'search-results';
+resultsContainer.style.position = 'fixed';
+resultsContainer.style.top = '80px';
+resultsContainer.style.left = '50%';
+resultsContainer.style.transform = 'translateX(-50%)';
+resultsContainer.style.width = '80%';
+resultsContainer.style.maxHeight = '70vh';
+resultsContainer.style.overflowY = 'auto';
+resultsContainer.style.background = 'rgba(255, 255, 255, 0.95)';
+resultsContainer.style.backdropFilter = 'blur(10px)';
+resultsContainer.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)';
+resultsContainer.style.borderRadius = '12px';
+resultsContainer.style.padding = '20px';
+resultsContainer.style.display = 'none';
+resultsContainer.style.zIndex = '3000';
+document.body.appendChild(resultsContainer);
+
+
+  if (!query) {
+    resultsContainer.style.display = 'none';
+    return;
+  }
+
+  try {
+    // 🛰️ Fetch all products from backend
+    const response = await fetch('http://localhost:5000/products');
+    const products = await response.json();
+
+    // 🔎 Filter matching products
+    const matched = products.filter(p =>
+      p.name.toLowerCase().includes(query) ||
+      p.category.toLowerCase().includes(query)
+    );
+
+    if (matched.length === 0) {
+      resultsContainer.innerHTML = `<p style="text-align:center; color:#555;">No products found for "<b>${query}</b>"</p>`;
+    } else {
+      matched.forEach(p => {
+        const div = document.createElement('div');
+        div.style.display = 'flex';
+        div.style.alignItems = 'center';
+        div.style.justifyContent = 'space-between';
+        div.style.marginBottom = '15px';
+        div.style.padding = '10px 15px';
+        div.style.borderBottom = '1px solid #ddd';
+        div.style.background = 'rgba(255,255,255,0.85)';
+        div.style.borderRadius = '8px';
+        div.innerHTML = `
+          <div style="display:flex; align-items:center; gap:15px;">
+            <img src="${p.image_url}" style="width:80px; height:80px; object-fit:cover; border-radius:10px;">
+            <div>
+              <h3 style="margin:0; font-size:1.1em; color:#28a745;">${p.name}</h3>
+              <p style="margin:5px 0; color:#555;">Category: ${p.category}</p>
+            </div>
+          </div>
+          <div>
+            <p style="font-weight:bold; color:#dc3545;">$${p.price.toFixed(2)}</p>
+            <button style="padding:6px 12px; background-color:#007bff; color:white; border:none; border-radius:6px; cursor:pointer;">Add to Cart</button>
+          </div>
+        `;
+        resultsContainer.appendChild(div);
+      });
+    }
+
+    resultsContainer.style.display = 'block';
+  } catch (error) {
+    console.error('❌ Error fetching products:', error);
+    resultsContainer.innerHTML = `<p style="color:red; text-align:center;">Error fetching products from server.</p>`;
+    resultsContainer.style.display = 'block';
+  }
+
+
+// 🖱️ Events
+searchBtn.addEventListener('click', performSearch);
+searchInput.addEventListener('keypress', e => {
+  if (e.key === 'Enter') performSearch();
+});
+
+// 🧹 Hide results when clicking outside
+document.addEventListener('click', e => {
+  if (!resultsContainer.contains(e.target) && e.target !== searchInput && e.target !== searchBtn) {
+    resultsContainer.style.display = 'none';
+  }
+});
+// 🟢 Add search items to same cart as normal items
+document.addEventListener("click", (e) => {
+  if (e.target.classList.contains("add-btn")) {
+    const parent = e.target.closest(".product-box");
+    if (!parent) return;
+
+    const itemName = parent.querySelector("h4").textContent;
+    const itemPrice = parent.querySelector("p").textContent.replace("₹", "");
+    const itemImage = parent.querySelector("img").src;
+
+    // Get existing cart items
+    const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+
+    // Add this searched item to the same cart
+    cartItems.push({
+      name: itemName,
+      price: itemPrice,
+      image_url: itemImage,
+    });
+
+    // Save cart back
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+
+    alert(`✅ Thanks for ordering ${itemName}! It was added to your cart.`);
+  }
+});
+// --- INITIAL LOAD ---
+if (typeof products !== "undefined") {
+  displayProducts(products);
+} else {
+  console.warn("⚠️ products array not found. Check product.js import.");
+}
+
+
+</script>
+</body>
+</html>

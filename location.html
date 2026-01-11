@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+.location-check {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.location-check h2 {
+    color: #e76f51;
+    margin-bottom: 10px;
+}
+
+.location-check p {
+    font-size: 1.1em;
+    color: #555;
+    margin-bottom: 25px;
+}
+
+.location-form {
+    display: flex;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.location-form input {
+    flex-grow: 1;
+    padding: 12px 15px;
+    border: 2px solid #ccc;
+    border-radius: 5px 0 0 5px;
+    font-size: 1em;
+    outline: none;
+}
+
+.location-form input:focus {
+    border-color: #2a9d8f;
+}
+
+.check-btn {
+    background-color: #2a9d8f;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-weight: bold;
+}
+
+.check-btn:hover {
+    background-color: #264653;
+}
+
+.result-message {
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: 5px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Map and Current Address Card */
+.map-section {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.current-address-card {
+    background-color: #f7fff7;
+    border: 1px solid #2a9d8f;
+    padding: 15px;
+    border-radius: 8px;
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+.current-address-card p {
+    margin: 5px 0;
+}
+
+.edit-address-btn {
+    background-color: #e9c46a;
+    color: #264653;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.map-placeholder {
+    height: 300px;
+    background-color: #eee;
+    border-radius: 8px;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+    color: #999;
+}
+    </style>
+</head>
+<body>
+    <main class="container">
+    <h1 class="page-header">Manage Your Delivery Location 📍</h1>
+
+    <section class="location-check">
+        <h2>Check Service Availability</h2>
+        <p>Enter your zip code or address to ensure we deliver fresh groceries to your neighborhood.</p>
+        
+        <form class="location-form">
+            <input type="text" placeholder="Enter Zip Code or Full Address" required>
+            <button type="submit" class="check-btn">Check Availability</button>
+        </form>
+
+        <div id="availability-result" class="result-message hidden">
+            </div>
+    </section>
+
+    <section class="map-section">
+        <h2>Your Default Address</h2>
+        <div class="current-address-card">
+            <p><strong>Current Address:</strong> 123 Fresh Lane, Apt B, Freshville, 90210</p>
+            <p>Delivery Zone: FastTrack 🚀</p>
+            <button > class="edit-address-btn">Change Address</button>
+        </div>
+    </section>
+</main>
+<script>
+const locationForm = document.querySelector('.location-form');
+const resultDiv = document.getElementById('availability-result');
+
+if (locationForm) {
+    locationForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const address = locationForm.querySelector('input').value;
+        
+        resultDiv.classList.remove('hidden');
+        if (address.includes('90210') || address.toLowerCase().includes('freshville')) {
+            resultDiv.innerHTML = '✅ **Success!** We proudly deliver fresh groceries to your location!';
+            resultDiv.style.backgroundColor = '#d4edda'; 
+            resultDiv.style.color = '#155724';
+        } else {
+            resultDiv.innerHTML = '❌ **Sorry!** We do not currently serve that area.';
+            resultDiv.style.backgroundColor = '#f8d7da'; 
+            resultDiv.style.color = '#721c24'; 
+        }
+    });
+}
+</script>
+</body>
+</html>
